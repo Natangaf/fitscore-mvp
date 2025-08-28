@@ -7,7 +7,7 @@ Mini MVP para avaliação de candidatos com base em Performance, Energia e Cultu
 ## 🚀 Deploy
 
 O app está publicado em:
-👉 [https://seu-deploy.vercel.app](https://seu-deploy.vercel.app)
+👉 [https://seu-deploy.vercel.app](https://fitscore-mvp-gray.vercel.app/forms)
 
 ---
 
