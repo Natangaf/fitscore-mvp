@@ -1,0 +1,75 @@
+{
+  "name": "fitscore_top_report_12h",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "unit": "hours",
+              "value": 12
+            }
+          ]
+        }
+      },
+      "id": "Cron",
+      "name": "Cron 12h",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [200, 200]
+    },
+    {
+      "parameters": {
+        "authentication": "none",
+        "options": {},
+        "requestMethod": "GET",
+        "url": "https://bxpjlkhhodmtilvgdnym.supabase.co/rest/v1/candidates?select=name,email,fitscore,fit_class&fitscore=gte.80&order=fitscore.desc",
+        "jsonParameters": true,
+        "sendHeaders": true,
+        "headerParametersJson": "={\n  \"apikey\": \"SEU_SERVICE_ROLE_KEY_AQUI\",\n  \"Authorization\": \"Bearer SEU_SERVICE_ROLE_KEY_AQUI\",\n  \"Content-Type\": \"application/json\"\n}"
+      },
+      "id": "HTTP",
+      "name": "Supabase REST (Aprovados ≥80)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [470, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "const rows = Array.isArray(items[0]?.json) ? items[0].json : items.map(i=>i.json);\nif (!rows || rows.length === 0) {\n  return [{ json: { subject: \"Relatório — Aprovados (Fit ≥ 80)\", body: \"Olá,\\n\\nNenhum aprovado (Fit ≥ 80) nas últimas 12h.\\n\\n— LEGAL\" } }];\n}\nconst linhas = rows.map(r => `• ${r.name} <${r.email}> — ${Number(r.fitscore).toFixed(2)} (${r.fit_class})`).join('\\n');\nreturn [{ json: { subject: \"Relatório — Aprovados (Fit ≥ 80)\", body: `Olá,\\n\\nSeguem os aprovados das últimas 12h:\\n\\n${linhas}\\n\\n— LEGAL` } }];"
+      },
+      "id": "Code",
+      "name": "Formatar Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [740, 200]
+    },
+    {
+      "parameters": {
+        "options": {},
+        "fromEmail": "LEGAL <no-reply@legal.com>",
+        "toEmail": "gestor@legal.com",
+        "subject": "={{$json[\"subject\"]}}",
+        "text": "={{$json[\"body\"]}}",
+        "transport": "smtp"
+      },
+      "id": "Email",
+      "name": "Enviar ao Gestor",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [980, 200],
+      "credentials": {
+        "smtp": {
+          "id": "SMTP_CREDENTIAL_ID",
+          "name": "SMTP_LEGAL"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron 12h": { "main": [[{ "node": "Supabase REST (Aprovados ≥80)", "type": "main", "index": 0 }]] },
+    "Supabase REST (Aprovados ≥80)": { "main": [[{ "node": "Formatar Email", "type": "main", "index": 0 }]] },
+    "Formatar Email": { "main": [[{ "node": "Enviar ao Gestor", "type": "main", "index": 0 }]] }
+  }
+}
