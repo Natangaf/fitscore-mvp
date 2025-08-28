@@ -1,4 +1,3 @@
-// src/app/login/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -25,6 +24,7 @@ export default function LoginPage() {
     const { error } = await s.auth.signInWithPassword({ email, password });
     setLoadingPwd(false);
     if (error) return setErr(error.message);
+    router.refresh();
     router.replace(redirectTo);
   }
 
@@ -40,7 +40,6 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Login com e-mail/senha */}
         <form onSubmit={onLogin} className="grid gap-3">
           <input
             className="rounded-xl bg-white/10 px-3 py-2 outline-none"

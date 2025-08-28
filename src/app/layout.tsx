@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { routes } from "@/routes";
+import { supabaseServer } from "@/lib/supabase-server";
+import NavBar from "@/components/NavBar";
 
 export const metadata: Metadata = {
   title: "FitScore — Mini MVP",
   description: "Formulário + Dashboard de avaliação",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Lê sessão no server para o primeiro render (SSR)
+  const supabase = supabaseServer();
+  const { data } = await supabase.auth.getSession();
+  const initialIsAuthed = !!data?.session;
+
   return (
     <html lang="pt-BR">
       <body className="min-h-screen">
-        <nav className="bg-slate-900 text-white">
-          <div className="mx-auto max-w-5xl px-4 py-3 flex gap-4">
-            <a href="/forms" className="hover:underline">Formulário</a>
-            <a href="/dashboard" className="hover:underline">Dashboard</a>
-          </div>
-        </nav>
+        <NavBar initialIsAuthed={initialIsAuthed} />
         {children}
       </body>
     </html>
