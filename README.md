@@ -1,36 +1,143 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FitScore — Mini MVP
 
-## Getting Started
+Mini MVP para avaliação de candidatos com base em Performance, Energia e Cultura, gerando um FitScore e classificação automática.
 
-First, run the development server:
+---
+
+## 🚀 Deploy
+
+O app está publicado em:
+👉 [https://seu-deploy.vercel.app](https://seu-deploy.vercel.app)
+
+---
+
+## ✨ Features
+
+* **Formulário FitScore** com 10 perguntas em 3 blocos (Performance, Energia, Cultura).
+* **Dashboard** para avaliadores:
+
+  * Lista de candidatos avaliados
+  * Filtros por classificação
+  * Breakdown P/E/C com barras + marcador
+  * KPIs e donut de distribuição
+  * Estados de *loading*, *empty* e *error*
+* **Autenticação com Supabase** (email/senha).
+* **Persistência** dos candidatos no Supabase (tabela `candidates`).
+* **Processamento Assíncrono com n8n**:
+
+  * Envio automático de e-mail ao candidato com seu resultado após envio do formulário.
+  * Relatório de aprovados (FitScore ≥ 80) enviado ao gestor a cada 12h.
+* **Arquitetura documentada** na pasta [`/docs`](./docs).
+
+---
+
+## 📦 Stack
+
+* **Front-end:** Next.js (App Router, TSX, TailwindCSS)
+* **Auth & DB:** Supabase (auth + Postgres)
+* **Processos assíncronos:** n8n (workflows com webhooks + SMTP)
+* **Deploy:** Vercel
+
+---
+
+## ⚙️ Setup
+
+### 1. Clone e instale dependências
+
+```bash
+git clone https://github.com/seu-usuario/fitscore-mvp.git
+cd fitscore-mvp
+npm install
+```
+
+### 2. Configuração do Supabase
+
+No Supabase, crie:
+
+* Projeto (free tier)
+* Tabela `candidates`:
+
+```sql
+create table candidates (
+  id uuid primary key default gen_random_uuid(),
+  name text,
+  email text,
+  p_experiencia int,
+  p_entregas int,
+  p_habilidades int,
+  e_disponibilidade int,
+  e_prazos int,
+  e_pressao int,
+  e_proatividade int,
+  c_valores int,
+  c_comunicacao int,
+  c_colaboracao int,
+  fitscore float,
+  fit_class text,
+  created_at timestamp default now()
+);
+```
+
+Crie variáveis em `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=... # usado no n8n
+```
+
+### 3. Rodar local
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📊 Processamento Assíncrono (n8n)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* **Workflow 1 — Notificação de Resultado**
 
-## Learn More
+  * Trigger: Webhook chamado pelo envio do formulário.
+  * Ações:
 
-To learn more about Next.js, take a look at the following resources:
+    * Inserir candidato no Supabase.
+    * Enviar e-mail com o resultado (FitScore e classificação).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* **Workflow 2 — Relatório de Aprovados**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+  * Trigger: Cron (a cada 12h).
+  * Ações:
 
-## Deploy on Vercel
+    * Consultar Supabase (candidatos com `fitscore >= 80`).
+    * Enviar e-mail consolidado ao gestor.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* **Plus**: possibilidade de adicionar lógica extra (ex.: enviar resumo semanal em CSV/Excel para análise do time de RH).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📚 Documentação
+
+Detalhes adicionais de arquitetura e decisões técnicas estão em [`/docs/arquitetura.md`](./docs/arquitetura.md).
+
+---
+
+## 📹 Vídeo
+
+Foi gravado um vídeo de até 5 minutos mostrando:
+
+* Formulário de envio
+* Dashboard filtrando candidatos
+* Fluxo no n8n funcionando
+
+👉 Link: *(inserir aqui)*
+
+---
+
+## ✅ Critérios Atendidos
+
+* Deploy público ✔️
+* Processo assíncrono implementado ✔️
+* Persistência no Supabase ✔️
+* Front-end bem trabalhado ✔️
+* README + Docs completos ✔️

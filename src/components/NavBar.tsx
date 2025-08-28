@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 
-export default function NavBar({ initialIsAuthed }: { initialIsAuthed: boolean }) {
+export default function NavBar({
+  initialIsAuthed,
+}: {
+  initialIsAuthed: boolean;
+}) {
   const s = supabaseBrowser();
   const router = useRouter();
   const [isAuthed, setIsAuthed] = useState(initialIsAuthed);
@@ -41,8 +45,12 @@ export default function NavBar({ initialIsAuthed }: { initialIsAuthed: boolean }
         <div className="ml-auto flex items-center gap-4">
           {isAuthed ? (
             <>
-              <a href="/forms" className="hover:underline">Formulário</a>
-              <a href="/dashboard" className="hover:underline">Dashboard</a>
+              <a href="/forms" className="hover:underline">
+                Formulário
+              </a>
+              <a href="/dashboard" className="hover:underline">
+                Dashboard
+              </a>
               <button
                 onClick={signOut}
                 className="text-sm opacity-80 hover:opacity-100"
@@ -53,7 +61,14 @@ export default function NavBar({ initialIsAuthed }: { initialIsAuthed: boolean }
               </button>
             </>
           ) : (
-            <a href="/login" className="hover:underline">Entrar</a>
+            <>
+              <a href="/forms" className="hover:underline">
+                Formulário
+              </a>
+              <a href="/login" className="hover:underline">
+                Entrar
+              </a>
+            </>
           )}
         </div>
       </div>
